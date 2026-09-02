@@ -1,8 +1,6 @@
 import { tasks } from '../data/tasks.js';
 import type { Task } from '../models/task.js';
 
-// ── Base functions (guía) ────────────────────────────────────────────────────
-
 export const listTasks = (): readonly Task[] => tasks;
 
 export const findTaskById = (id: number): Task | undefined =>
@@ -38,12 +36,6 @@ export const completeTask = (id: number): Task => {
   return task;
 };
 
-// ── Desafío individual ───────────────────────────────────────────────────────
-
-/**
- * Elimina la tarea con el id indicado.
- * Lanza un error si no existe ninguna tarea con ese id.
- */
 export const deleteTask = (id: number): Task => {
   const index = tasks.findIndex((task) => task.id === id);
 
@@ -60,8 +52,5 @@ export const deleteTask = (id: number): Task => {
   return deleted;
 };
 
-/**
- * Devuelve únicamente las tareas con estado 'pending'.
- */
 export const listPendingTasks = (): readonly Task[] =>
   tasks.filter((task) => task.status === 'pending');
