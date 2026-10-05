@@ -1,0 +1,684 @@
+{
+  "info": {
+    "name": "Task API - EC2 F2 A6",
+    "description": "Pruebas de modelado y persistencia en MongoDB Atlas (EC2 F2 A6). Positivas, negativas, regresión y desafío individual (description opcional). Ejecuta las carpetas en orden: POST guarda {{taskId}}.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000"
+    },
+    {
+      "key": "taskId",
+      "value": ""
+    },
+    {
+      "key": "missingId",
+      "value": "507f1f77bcf86cd799439011"
+    }
+  ],
+  "item": [
+    {
+      "name": "EC2 F2 A2 Persistencia",
+      "item": [
+        {
+          "name": "Positivas",
+          "item": [
+            {
+              "name": "GET /health",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/health",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["health"]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                      "const body = pm.response.json();",
+                      "const items = Array.isArray(body.data) ? body.data : [body.data];",
+                      "pm.test('No expone _id ni __v', () => items.forEach((t) => { pm.expect(t).to.not.have.property('_id'); pm.expect(t).to.not.have.property('__v'); }));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "GET /health/database",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/health/database",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["health", "database"]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                      "pm.test('connected', () => pm.expect(pm.response.json().data.database.status).to.eql('connected'));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "POST /api/tasks",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/tasks",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "tasks"]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"title\": \"Diseñar el modelo de tareas\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Responde 201', () => pm.response.to.have.status(201));",
+                      "const body = pm.response.json();",
+                      "const items = Array.isArray(body.data) ? body.data : [body.data];",
+                      "pm.test('No expone _id ni __v', () => items.forEach((t) => { pm.expect(t).to.not.have.property('_id'); pm.expect(t).to.not.have.property('__v'); }));",
+                      "const body = pm.response.json();",
+                      "pm.collectionVariables.set('taskId', body.data.id);",
+                      "pm.test('id es ObjectId de 24 hex', () => pm.expect(body.data.id).to.match(/^[0-9a-f]{24}$/));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "GET /api/tasks",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/tasks",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "tasks"]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                      "const body = pm.response.json();",
+                      "const items = Array.isArray(body.data) ? body.data : [body.data];",
+                      "pm.test('No expone _id ni __v', () => items.forEach((t) => { pm.expect(t).to.not.have.property('_id'); pm.expect(t).to.not.have.property('__v'); }));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "GET /api/tasks/{{taskId}}",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/tasks/{{taskId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "tasks", "{{taskId}}"]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                      "const body = pm.response.json();",
+                      "const items = Array.isArray(body.data) ? body.data : [body.data];",
+                      "pm.test('No expone _id ni __v', () => items.forEach((t) => { pm.expect(t).to.not.have.property('_id'); pm.expect(t).to.not.have.property('__v'); }));"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Negativas",
+          "item": [
+            {
+              "name": "GET /api/tasks/1 (INVALID_ID)",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/tasks/1",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "tasks", "1"]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Responde 400', () => pm.response.to.have.status(400));",
+                      "const body = pm.response.json();",
+                      "pm.test('code INVALID_ID', () => pm.expect(body.error.code).to.eql('INVALID_ID'));",
+                      "pm.test('Incluye requestId', () => pm.expect(body.error.requestId).to.be.a('string'));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "GET ObjectId inexistente",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/tasks/{{missingId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "tasks", "{{missingId}}"]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Responde 404', () => pm.response.to.have.status(404));",
+                      "const body = pm.response.json();",
+                      "pm.test('code TASK_NOT_FOUND', () => pm.expect(body.error.code).to.eql('TASK_NOT_FOUND'));",
+                      "pm.test('Incluye requestId', () => pm.expect(body.error.requestId).to.be.a('string'));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "POST title vacío",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/tasks",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "tasks"]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"title\": \"   \"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Responde 422', () => pm.response.to.have.status(422));",
+                      "const body = pm.response.json();",
+                      "pm.test('code VALIDATION_ERROR', () => pm.expect(body.error.code).to.eql('VALIDATION_ERROR'));",
+                      "pm.test('Incluye requestId', () => pm.expect(body.error.requestId).to.be.a('string'));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "POST title 121 caracteres",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/tasks",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "tasks"]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"title\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Responde 422', () => pm.response.to.have.status(422));",
+                      "const body = pm.response.json();",
+                      "pm.test('code VALIDATION_ERROR', () => pm.expect(body.error.code).to.eql('VALIDATION_ERROR'));",
+                      "pm.test('Incluye requestId', () => pm.expect(body.error.requestId).to.be.a('string'));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "POST raw Text",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "text/plain"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/tasks",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "tasks"]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "Diseñar el modelo"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Responde 415', () => pm.response.to.have.status(415));",
+                      "const body = pm.response.json();",
+                      "pm.test('code UNSUPPORTED_MEDIA_TYPE', () => pm.expect(body.error.code).to.eql('UNSUPPORTED_MEDIA_TYPE'));",
+                      "pm.test('Incluye requestId', () => pm.expect(body.error.requestId).to.be.a('string'));"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Regresión",
+          "item": [
+            {
+              "name": "1 Crear",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/tasks",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "tasks"]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"title\": \"Tarea de regresión\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Responde 201', () => pm.response.to.have.status(201));",
+                      "const body = pm.response.json();",
+                      "const items = Array.isArray(body.data) ? body.data : [body.data];",
+                      "pm.test('No expone _id ni __v', () => items.forEach((t) => { pm.expect(t).to.not.have.property('_id'); pm.expect(t).to.not.have.property('__v'); }));",
+                      "const body = pm.response.json();",
+                      "pm.collectionVariables.set('taskId', body.data.id);",
+                      "pm.test('id es ObjectId de 24 hex', () => pm.expect(body.data.id).to.match(/^[0-9a-f]{24}$/));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "2 Consultar",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/tasks/{{taskId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "tasks", "{{taskId}}"]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                      "const body = pm.response.json();",
+                      "const items = Array.isArray(body.data) ? body.data : [body.data];",
+                      "pm.test('No expone _id ni __v', () => items.forEach((t) => { pm.expect(t).to.not.have.property('_id'); pm.expect(t).to.not.have.property('__v'); }));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "3 Completar",
+              "request": {
+                "method": "PATCH",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/tasks/{{taskId}}/complete",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "tasks", "{{taskId}}", "complete"]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                      "const body = pm.response.json();",
+                      "const items = Array.isArray(body.data) ? body.data : [body.data];",
+                      "pm.test('No expone _id ni __v', () => items.forEach((t) => { pm.expect(t).to.not.have.property('_id'); pm.expect(t).to.not.have.property('__v'); }));",
+                      "pm.test('status completed', () => pm.expect(pm.response.json().data.status).to.eql('completed'));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "4 Consultar de nuevo",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/tasks/{{taskId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "tasks", "{{taskId}}"]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                      "const body = pm.response.json();",
+                      "const items = Array.isArray(body.data) ? body.data : [body.data];",
+                      "pm.test('No expone _id ni __v', () => items.forEach((t) => { pm.expect(t).to.not.have.property('_id'); pm.expect(t).to.not.have.property('__v'); }));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "5 Eliminar",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/tasks/{{taskId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "tasks", "{{taskId}}"]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Responde 204', () => pm.response.to.have.status(204));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "6 Consultar al final",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/tasks/{{taskId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "tasks", "{{taskId}}"]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Responde 404', () => pm.response.to.have.status(404));",
+                      "const body = pm.response.json();",
+                      "pm.test('code TASK_NOT_FOUND', () => pm.expect(body.error.code).to.eql('TASK_NOT_FOUND'));",
+                      "pm.test('Incluye requestId', () => pm.expect(body.error.requestId).to.be.a('string'));"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Desafío - description",
+          "item": [
+            {
+              "name": "POST con description",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/tasks",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "tasks"]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"title\": \"Tarea con descripción\",\n  \"description\": \"   Texto con espacios externos   \"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Responde 201', () => pm.response.to.have.status(201));",
+                      "const body = pm.response.json();",
+                      "const items = Array.isArray(body.data) ? body.data : [body.data];",
+                      "pm.test('No expone _id ni __v', () => items.forEach((t) => { pm.expect(t).to.not.have.property('_id'); pm.expect(t).to.not.have.property('__v'); }));",
+                      "const body = pm.response.json();",
+                      "pm.collectionVariables.set('taskId', body.data.id);",
+                      "pm.test('id es ObjectId de 24 hex', () => pm.expect(body.data.id).to.match(/^[0-9a-f]{24}$/));",
+                      "pm.test('description recortada', () => pm.expect(body.data.description).to.eql('Texto con espacios externos'));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "GET devuelve description",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/tasks/{{taskId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "tasks", "{{taskId}}"]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                      "const body = pm.response.json();",
+                      "const items = Array.isArray(body.data) ? body.data : [body.data];",
+                      "pm.test('No expone _id ni __v', () => items.forEach((t) => { pm.expect(t).to.not.have.property('_id'); pm.expect(t).to.not.have.property('__v'); }));",
+                      "pm.test('Incluye description', () => pm.expect(pm.response.json().data.description).to.eql('Texto con espacios externos'));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "POST sin description",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/tasks",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "tasks"]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"title\": \"Tarea sin descripción\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Responde 201', () => pm.response.to.have.status(201));",
+                      "const body = pm.response.json();",
+                      "const items = Array.isArray(body.data) ? body.data : [body.data];",
+                      "pm.test('No expone _id ni __v', () => items.forEach((t) => { pm.expect(t).to.not.have.property('_id'); pm.expect(t).to.not.have.property('__v'); }));",
+                      "pm.test('Sin description', () => pm.expect(pm.response.json().data).to.not.have.property('description'));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "POST description 301 caracteres",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/tasks",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "tasks"]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"title\": \"Descripción larga\",\n  \"description\": \"ddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Responde 422', () => pm.response.to.have.status(422));",
+                      "const body = pm.response.json();",
+                      "pm.test('code VALIDATION_ERROR', () => pm.expect(body.error.code).to.eql('VALIDATION_ERROR'));",
+                      "pm.test('Incluye requestId', () => pm.expect(body.error.requestId).to.be.a('string'));",
+                      "pm.test('field description', () => pm.expect(body.error.details[0].field).to.eql('description'));"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
