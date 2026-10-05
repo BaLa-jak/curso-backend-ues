@@ -1,4 +1,5 @@
 import express from 'express';
+import { healthRouter } from './routes/health.routes.js';
 import { taskRouter } from './routes/task.routes.js';
 import { requestContext } from './middlewares/request-context.middleware.js';
 import { notFound } from './middlewares/not-found.middleware.js';
@@ -9,10 +10,7 @@ export const app = express();
 app.use(requestContext);
 app.use(express.json());
 
-app.get('/health', (_req, res) => {
-  res.status(200).json({ status: 'ok' });
-});
-
+app.use('/health', healthRouter);
 app.use('/api/tasks', taskRouter);
 
 app.use(notFound);
