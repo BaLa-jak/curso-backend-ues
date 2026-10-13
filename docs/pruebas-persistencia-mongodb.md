@@ -37,7 +37,7 @@
 | Negativa        | POST /api/tasks                         | title vacío                       | 422 VALIDATION_ERROR       | 422 VALIDATION_ERROR (field title)                               | 788cc43e-0bf2-447f-88c3-995d7529e94f | Correcto    |
 | Negativa        | POST /api/tasks                         | title de 121 caracteres           | 422 VALIDATION_ERROR       | 422 VALIDATION_ERROR (field title)                               | 74572259-4d43-4dee-a5b5-1e5fe092c3c1 | Correcto    |
 | Negativa        | POST /api/tasks                         | raw Text                          | 415 UNSUPPORTED_MEDIA_TYPE | 415 UNSUPPORTED_MEDIA_TYPE                                       | 4d55e2e1-fdb0-4b14-96f8-24d06888d5cb | Correcto    |
-| Infraestructura | Arranque                                | Contraseña incorrecta             | API no escucha             | _Pendiente de ejecutar_                                          | No aplica                            | _Pendiente_ |
+| Infraestructura | Arranque                                | Contraseña incorrecta             | API no escucha             | Exit 1, puerto 3000 cerrado, solo mensaje seguro                 | No aplica                            | Correcto    |
 
 ### Desafío individual: description opcional
 
@@ -54,6 +54,6 @@
 1. Compilación correcta: `pnpm check` y `pnpm build` terminaron sin errores.
 2. POST y documento visible en Atlas sin credenciales: _agregar captura de Data Explorer._
 3. Consulta después de reiniciar: el PID cambió de 31951 a 33266 y la tarea `6ac420c71b839c1011889c0f` siguió disponible.
-4. Un error HTTP (400 INVALID_ID), una regla del negocio (404 TASK_NOT_FOUND) y una falla de infraestructura (_pendiente: arranque con contraseña inválida; la API debe mostrar solo el mensaje seguro de `server.ts` y no abrir el puerto_).
+4. Un error HTTP (400 INVALID_ID), una regla del negocio (404 TASK_NOT_FOUND) y una falla de infraestructura: al arrancar con una contraseña incorrecta (sobrescrita solo en la variable de entorno del proceso, sin modificar `.env`), la API terminó con código 1, el puerto 3000 nunca abrió (`curl` sin conexión) y la terminal mostró únicamente `No fue posible iniciar la API. Revise MONGODB_URI, el usuario y la lista de acceso de red.`, sin URI, usuario, host ni stack.
 
 Colección de Postman: `docs/Task-API-EC2-F2-A6.postman_collection.json`.
