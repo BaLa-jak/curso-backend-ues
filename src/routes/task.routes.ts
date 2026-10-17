@@ -2,9 +2,9 @@ import { Router } from 'express';
 import {
   getTask,
   getTasks,
+  patchTask,
   patchTaskComplete,
   patchTaskStatus,
-  patchTaskTitle,
   postTask,
   removeTask,
 } from '../controllers/task.controller.js';
@@ -13,6 +13,7 @@ import { validateCompletion } from '../middlewares/validate-completion.middlewar
 import { validateTaskDescription } from '../middlewares/validate-task-description.middleware.js';
 import { validateTaskId } from '../middlewares/validate-task-id.middleware.js';
 import { validateTaskTitle } from '../middlewares/validate-task-title.middleware.js';
+import { validateTaskUpdate } from '../middlewares/validate-task-update.middleware.js';
 
 export const taskRouter = Router();
 
@@ -23,5 +24,5 @@ taskRouter.get('/:id', getTask);
 taskRouter.post('/', requireJson, validateTaskTitle, validateTaskDescription, postTask);
 taskRouter.patch('/:id/complete', patchTaskComplete);
 taskRouter.patch('/:id/status', requireJson, validateCompletion, patchTaskStatus);
-taskRouter.patch('/:id', requireJson, validateTaskTitle, patchTaskTitle);
+taskRouter.patch('/:id', requireJson, validateTaskUpdate, patchTask);
 taskRouter.delete('/:id', removeTask);

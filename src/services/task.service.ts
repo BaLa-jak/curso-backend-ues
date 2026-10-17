@@ -1,6 +1,6 @@
 import mongoose, { type HydratedDocument } from 'mongoose';
 import { AppError } from '../errors/app-error.js';
-import { TaskModel, type Task, type TaskPersistence } from '../models/task.js';
+import { TaskModel, type Task, type TaskPersistence, type TaskUpdate } from '../models/task.js';
 
 const toTask = (document: HydratedDocument<TaskPersistence>): Task => ({
   id: document._id.toString(),
@@ -71,12 +71,13 @@ export const createTask = async (title: string, description?: string): Promise<T
   }
 };
 
-const updateTask = async (id: string, changes: Partial<TaskPersistence>): Promise<Task> => {
+export const updateTask = async (id: string, changes: TaskUpdate): Promise<Task> => {
   try {
-    const document = await TaskModel.findByIdAndUpdate(id, changes, {
-      new: true,
-      runValidators: true,
-    });
+    const document = await TaskModel.findByIdAndUpdate(
+      id,
+      { $set: changes },
+      { new: true, runValidators: true },
+    );
     if (!document) throw taskNotFound(id);
     return toTask(document);
   } catch (error: unknown) {
@@ -85,9 +86,6 @@ const updateTask = async (id: string, changes: Partial<TaskPersistence>): Promis
 };
 
 export const completeTask = (id: string): Promise<Task> => updateTask(id, { status: 'completed' });
-
-export const updateTaskTitle = (id: string, title: string): Promise<Task> =>
-  updateTask(id, { title });
 
 export const setTaskStatus = (id: string, completed: boolean): Promise<Task> =>
   updateTask(id, { status: completed ? 'completed' : 'pending' });
