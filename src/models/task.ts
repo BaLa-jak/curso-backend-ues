@@ -20,6 +20,12 @@ export interface Task {
   updatedAt: Date;
 }
 
+export interface TaskUpdate {
+  title?: string;
+  description?: string;
+  status?: TaskStatus;
+}
+
 const taskSchema = new Schema<TaskPersistence>(
   {
     title: {
