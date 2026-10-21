@@ -31,8 +31,10 @@
     "typescript": "^7.0.2"
   },
   "dependencies": {
+    "bcryptjs": "3.0.3",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
+    "jose": "6.2.12",
     "mongoose": "^8.24.4"
   }
 }
