@@ -1,8 +1,7 @@
-import 'dotenv/config';
 import type { Server } from 'node:http';
 import { app } from './app.js';
 import { connectDatabase, disconnectDatabase } from './config/database.js';
-import { loadEnvironment } from './config/env.js';
+import { env } from './config/env.js';
 
 let server: Server | undefined;
 let isShuttingDown = false;
@@ -41,8 +40,6 @@ const shutdown = async (signal: NodeJS.Signals): Promise<void> => {
 
 const startServer = async (): Promise<void> => {
   try {
-    const env = loadEnvironment();
-
     await connectDatabase({
       uri: env.mongodbUri,
       dbName: env.mongodbDbName,
