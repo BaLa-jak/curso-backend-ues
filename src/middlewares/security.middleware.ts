@@ -21,6 +21,8 @@ const corsOptions: CorsOptions = {
 };
 
 export const securityHeaders = helmet();
+// Solo para /api-docs: Swagger UI necesita scripts y estilos propios que la CSP global bloquearía.
+export const documentationSecurityHeaders = helmet({ contentSecurityPolicy: false });
 export const corsPolicy = cors(corsOptions);
 
 // shortcut: almacén en memoria, por proceso; con varias instancias usar un store compartido.
