@@ -17,7 +17,6 @@ export const createAccessToken = (user: User): Promise<string> =>
     .setExpirationTime(env.jwtExpiresIn)
     .sign(secretKey);
 
-// Lista para el middleware de A10; todavía no protege rutas.
 export const verifyAccessToken = async (token: string): Promise<AccessTokenSubject> => {
   try {
     const { payload } = await jwtVerify(token, secretKey, {

@@ -8,6 +8,8 @@ import {
   postTask,
   removeTask,
 } from '../controllers/task.controller.js';
+import { authenticate } from '../middlewares/authenticate.middleware.js';
+import { requireRole } from '../middlewares/authorize.middleware.js';
 import { requireJson } from '../middlewares/require-json.middleware.js';
 import { validateCompletion } from '../middlewares/validate-completion.middleware.js';
 import { validateTaskDescription } from '../middlewares/validate-task-description.middleware.js';
@@ -18,6 +20,8 @@ import { validateTaskUpdate } from '../middlewares/validate-task-update.middlewa
 
 export const taskRouter = Router();
 
+// La autenticación va primero: clientes anónimos no llegan a los validadores.
+taskRouter.use(authenticate);
 taskRouter.param('id', validateTaskId);
 
 taskRouter.get('/', validateTaskQuery, getTasks);
@@ -26,4 +30,4 @@ taskRouter.post('/', requireJson, validateTaskTitle, validateTaskDescription, po
 taskRouter.patch('/:id/complete', patchTaskComplete);
 taskRouter.patch('/:id/status', requireJson, validateCompletion, patchTaskStatus);
 taskRouter.patch('/:id', requireJson, validateTaskUpdate, patchTask);
-taskRouter.delete('/:id', removeTask);
+taskRouter.delete('/:id', requireRole('admin'), removeTask);
