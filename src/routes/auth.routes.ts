@@ -7,9 +7,7 @@ import { validateLogin, validateRegister } from '../middlewares/validate-auth.mi
 
 export const authRouter = Router();
 
-// /me va antes del limitador: consultar la identidad no consume intentos de login.
+// El límite se aplica solo a los intentos de credenciales; /me no consume el cupo.
+authRouter.post('/register', authRateLimiter, requireJson, validateRegister, postRegister);
+authRouter.post('/login', authRateLimiter, requireJson, validateLogin, postLogin);
 authRouter.get('/me', authenticate, getMe);
-
-authRouter.use(authRateLimiter);
-authRouter.post('/register', requireJson, validateRegister, postRegister);
-authRouter.post('/login', requireJson, validateLogin, postLogin);

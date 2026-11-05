@@ -64,6 +64,10 @@ export const findUserDocumentByEmail = (
     return query;
   });
 
+// findById respeta select: false, así que nunca trae passwordHash.
+export const findUserDocumentById = (id: string): Promise<UserDocument | null> =>
+  execute(() => UserModel.findById(id));
+
 export const createUserDocument = (data: CreateUserRecord): Promise<UserDocument> =>
   execute(() => UserModel.create(data));
 
