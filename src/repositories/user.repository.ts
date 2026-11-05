@@ -66,3 +66,9 @@ export const findUserDocumentByEmail = (
 
 export const createUserDocument = (data: CreateUserRecord): Promise<UserDocument> =>
   execute(() => UserModel.create(data));
+
+// runValidators impide guardar un rol fuera de USER_ROLES; devuelve null si no existe.
+export const setUserRoleByEmail = (email: string, role: UserRole): Promise<UserDocument | null> =>
+  execute(() =>
+    UserModel.findOneAndUpdate({ email }, { $set: { role } }, { new: true, runValidators: true }),
+  );
