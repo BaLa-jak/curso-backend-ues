@@ -40,6 +40,17 @@ const readJwtExpiration = (): string => {
   return value;
 };
 
+// Rechaza cero, negativos, decimales y texto para evitar límites ambiguos.
+const readPositiveInteger = (name: string, fallback: number): number => {
+  const value = Number(process.env[name] ?? fallback);
+
+  if (!Number.isInteger(value) || value < 1) {
+    throw new Error(`${name} debe ser un número entero mayor que cero.`);
+  }
+
+  return value;
+};
+
 export interface EnvironmentConfig {
   port: number;
   mongodbUri: string;
@@ -48,6 +59,9 @@ export interface EnvironmentConfig {
   jwtExpiresIn: string;
   jwtIssuer: string;
   jwtAudience: string;
+  corsOrigin: string;
+  authRateLimitWindowMs: number;
+  authRateLimitMax: number;
 }
 
 export const loadEnvironment = (): EnvironmentConfig => {
@@ -59,6 +73,10 @@ export const loadEnvironment = (): EnvironmentConfig => {
     jwtExpiresIn: readJwtExpiration(),
     jwtIssuer: process.env.JWT_ISSUER?.trim() || 'task-api-express',
     jwtAudience: process.env.JWT_AUDIENCE?.trim() || 'task-api-client',
+    // El origen no tiene valor predeterminado: debe decidirse explícitamente.
+    corsOrigin: requireEnvironmentVariable('CORS_ORIGIN'),
+    authRateLimitWindowMs: readPositiveInteger('AUTH_RATE_LIMIT_WINDOW_MS', 900_000),
+    authRateLimitMax: readPositiveInteger('AUTH_RATE_LIMIT_MAX', 10),
   };
 };
 
